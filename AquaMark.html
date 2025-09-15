@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aqua Mark Login</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Import the new 'Roboto' font and keep the original 'Inter' font */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Updated background image with prawns */
+            background-image: url('https://images.unsplash.com/photo-1628103444855-667793d5f992?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            background-color: #0d47a1; /* Fallback solid color */
+            transition: background-image 0.5s ease-in-out;
+        }
+
+        /* Overlay to make content more readable */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* Dark semi-transparent overlay */
+            backdrop-filter: blur(2px); /* Optional blur effect */
+        }
+
+        /* Ensure the login card is above the overlay */
+        .login-card {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* CSS for the animated water effect on the title */
+        .aqua-effect {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(
+                90deg,
+                #85d0e3 0%,
+                #1e90ff 25%,
+                #85d0e3 50%,
+                #1e90ff 75%,
+                #85d0e3 100%
+            );
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            /* Adjusted shadow for a softer, bubble-like appearance */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            /* Updated animation to a bubble effect */
+            animation: flow 5s linear infinite, bubble 2s ease-in-out infinite;
+        }
+
+        /* Original animation for the flowing gradient */
+        @keyframes flow {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        /* New animation for the undulating bubble effect */
+        @keyframes bubble {
+            0%, 100% {
+                transform: scale(0.98);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.02);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4 relative">
+    <div class="login-card bg-white p-8 rounded-2xl shadow-xl w-full max-w-md mx-auto">
+        <!-- Main title and subtitle -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold aqua-effect">✔ Aqua Mark</h1>
+            <p class="text-xl mt-2 text-blue-600">Welcome!</p>
+        </div>
+
+        <!-- Role selection buttons (Seller/Buyer) -->
+        <div class="flex justify-center mb-6 space-x-4">
+            <button id="buyer-btn" class="flex-1 px-4 py-2 rounded-xl text-white font-semibold transition-colors duration-300 bg-blue-600 shadow-md hover:bg-blue-700">
+                Buyer
+            </button>
+            <button id="seller-btn" class="flex-1 px-4 py-2 rounded-xl text-gray-800 font-semibold bg-gray-200 hover:bg-gray-300 transition-colors duration-300">
+                Seller
+            </button>
+        </div>
+
+        <!-- Login form -->
+        <form id="login-form">
+            <div class="mb-4">
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="your.email@example.com" required>
+            </div>
+            <div class="mb-6 relative">
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <div class="relative">
+                    <input type="password" id="password" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••" required>
+                    <button type="button" id="togglePasswordVisibility" class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-600">
+                        <!-- Eye icon SVG -->
+                        <svg id="eye-open" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <svg id="eye-closed" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.488 0 2.934.343 4.253.97L13.875 18.825z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6M3 3l6 6" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-md hover:bg-blue-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                Log In
+            </button>
+            
+            <!-- Forgot password link moved here -->
+            <div class="mt-4 text-center">
+                <a href="#" class="block text-sm text-blue-600 hover:underline">Forgot Password?</a>
+            </div>
+        </form>
+
+        <div class="mt-4 text-center">
+            <p class="text-gray-500">Don't have an account?</p>
+            <button class="w-full mt-2 bg-white text-blue-600 font-bold py-3 rounded-xl border-2 border-blue-600 hover:bg-blue-50 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                Create an Account
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Get references to the buttons and form
+        const buyerBtn = document.getElementById('buyer-btn');
+        const sellerBtn = document.getElementById('seller-btn');
+        const loginForm = document.getElementById('login-form');
+        const body = document.body;
+
+        // Get references for the password toggle feature
+        const passwordInput = document.getElementById('password');
+        const togglePasswordBtn = document.getElementById('togglePasswordVisibility');
+        const eyeOpenIcon = document.getElementById('eye-open');
+        const eyeClosedIcon = document.getElementById('eye-closed');
+
+        // Function to update the button styles
+        function setActiveButton(activeButton) {
+            // Remove active classes from both buttons
+            buyerBtn.classList.remove('bg-blue-600', 'text-white');
+            buyerBtn.classList.add('bg-gray-200', 'text-gray-800');
+            sellerBtn.classList.remove('bg-blue-600', 'text-white');
+            sellerBtn.classList.add('bg-gray-200', 'text-gray-800');
+
+            // Add active classes to the clicked button
+            activeButton.classList.remove('bg-gray-200', 'text-gray-800');
+            activeButton.classList.add('bg-blue-600', 'text-white');
+        }
+
+        // Add event listeners to the buttons
+        buyerBtn.addEventListener('click', () => {
+            setActiveButton(buyerBtn);
+            console.log('Mode selected: Buyer');
+        });
+
+        sellerBtn.addEventListener('click', () => {
+            setActiveButton(sellerBtn);
+            console.log('Mode selected: Seller');
+        });
+
+        // Add a submit event listener to the form
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault(); // Prevent the default form submission
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Determine the selected role
+            let role = 'Buyer'; // Default to buyer
+            if (sellerBtn.classList.contains('bg-blue-600')) {
+                role = 'Seller';
+            }
+
+            console.log(`Login attempt for a ${role}:`);
+            console.log(`Email: ${email}`);
+            console.log(`Password: ${password}`);
+            
+            // Here you would typically send this data to a backend server for authentication.
+            // Example: fetch('/api/login', { method: 'POST', body: JSON.stringify({ email, password, role }) })
+        });
+        
+        // Event listener for the password visibility toggle
+        togglePasswordBtn.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Toggle the eye icons
+            eyeOpenIcon.classList.toggle('hidden');
+            eyeClosedIcon.classList.toggle('hidden');
+        });
+
+        // JavaScript to dynamically load the background image
+        window.onload = function() {
+            const bgImageUrl = 'https://images.unsplash.com/photo-1628103444855-667793d5f992?q=80&w=2070&auto=format&fit=crop';
+            const img = new Image();
+            img.onload = () => {
+                body.style.backgroundImage = `url('${bgImageUrl}')`;
+                console.log('Background image loaded successfully.');
+            };
+            img.onerror = () => {
+                console.error('Failed to load background image. Using solid fallback color.');
+                body.style.backgroundImage = 'none';
+            };
+            img.src = bgImageUrl;
+        };
+    </script>
+</body>
+</html>

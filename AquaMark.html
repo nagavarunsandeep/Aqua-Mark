@@ -6,6 +6,8 @@
     <title>Aqua Mark Login</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Link to Firebase setup -->
+    <script type="module" src="AquaMark.js"></script>
     <style>
         /* Import the new 'Roboto' font and keep the original 'Inter' font */
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Inter:wght@400;600;700&display=swap');
@@ -123,10 +125,26 @@
                 </div>
             </div>
             
+            <!-- Error Message Display -->
+            <div id="error-message" class="hidden text-center text-red-500 text-sm mb-4"></div>
+
             <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-md hover:bg-blue-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                 Log In
             </button>
             
+            <!-- Or Divider -->
+            <div class="relative flex py-4 items-center">
+                <div class="flex-grow border-t border-gray-300"></div>
+                <span class="flex-shrink mx-4 text-gray-500 text-sm">Or</span>
+                <div class="flex-grow border-t border-gray-300"></div>
+            </div>
+
+            <!-- Google Sign-In Button -->
+            <button type="button" id="google-signin-btn" class="w-full flex items-center justify-center bg-white border border-gray-300 py-2.5 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 transition duration-200 shadow-sm hover:shadow">
+                <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48px" height="48px"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.223,0-9.655-3.657-11.303-8H6.306C9.656,39.663,16.318,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C42.012,36.49,44,30.638,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg>
+                Sign in with Google
+            </button>
+
             <!-- Forgot password link moved here -->
             <div class="mt-4 text-center">
                 <a href="#" class="block text-sm text-blue-600 hover:underline">Forgot Password?</a>
@@ -135,13 +153,17 @@
 
         <div class="mt-4 text-center">
             <p class="text-gray-500">Don't have an account?</p>
-            <button class="w-full mt-2 bg-white text-blue-600 font-bold py-3 rounded-xl border-2 border-blue-600 hover:bg-blue-50 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            <a href="signup.html" class="block w-full mt-2 bg-white text-blue-600 font-bold py-3 rounded-xl border-2 border-blue-600 hover:bg-blue-50 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                 Create an Account
-            </button>
+            </a>
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        // Import Firebase auth functions
+        import { auth } from './AquaMark.js';
+        import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
         // Get references to the buttons and form
         const buyerBtn = document.getElementById('buyer-btn');
         const sellerBtn = document.getElementById('seller-btn');
@@ -153,6 +175,8 @@
         const togglePasswordBtn = document.getElementById('togglePasswordVisibility');
         const eyeOpenIcon = document.getElementById('eye-open');
         const eyeClosedIcon = document.getElementById('eye-closed');
+        const errorMessageDiv = document.getElementById('error-message');
+        const googleSignInBtn = document.getElementById('google-signin-btn');
 
         // Function to update the button styles
         function setActiveButton(activeButton) {
@@ -181,6 +205,7 @@
         // Add a submit event listener to the form
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault(); // Prevent the default form submission
+            errorMessageDiv.classList.add('hidden'); // Hide error on new submit
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -191,12 +216,43 @@
                 role = 'Seller';
             }
 
-            console.log(`Login attempt for a ${role}:`);
-            console.log(`Email: ${email}`);
-            console.log(`Password: ${password}`);
-            
-            // Here you would typically send this data to a backend server for authentication.
-            // Example: fetch('/api/login', { method: 'POST', body: JSON.stringify({ email, password, role }) })
+            // Sign in with Firebase
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Signed in successfully
+                    console.log('User signed in:', userCredential.user.email);
+                    window.location.href = 'dashboard.html'; // Redirect to dashboard
+                })
+                .catch((error) => {
+                    // Handle login errors
+                    let friendlyMessage = 'Invalid email or password. Please try again.';
+                    if (error.code === 'auth/invalid-credential') {
+                        friendlyMessage = 'Invalid email or password. Please try again.';
+                    }
+                    errorMessageDiv.textContent = friendlyMessage;
+                    errorMessageDiv.classList.remove('hidden');
+                    console.error('Login Error:', error);
+                });
+        });
+
+        // Add event listener for Google Sign-In
+        googleSignInBtn.addEventListener('click', () => {
+            const provider = new GoogleAuthProvider();
+
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    // This gives you a Google Access Token. You can use it to access the Google API.
+                    const credential = GoogleAuthProvider.credentialFromResult(result);
+                    const token = credential.accessToken;
+                    // The signed-in user info.
+                    const user = result.user;
+                    console.log('Signed in with Google:', user.displayName);
+                    window.location.href = 'dashboard.html'; // Redirect to dashboard
+                }).catch((error) => {
+                    errorMessageDiv.textContent = 'Failed to sign in with Google. Please try again.';
+                    errorMessageDiv.classList.remove('hidden');
+                    console.error('Google Sign-In Error:', error);
+                });
         });
         
         // Event listener for the password visibility toggle
